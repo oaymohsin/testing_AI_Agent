@@ -18,6 +18,10 @@ app.get('/health-check', (req, res) => {
   res.status(200).send('Server is running');
 });
 
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
+
 app.use('/api/auth', authRoutes);
 
 // Connect to MongoDB, then start the server. Server error handler lets us reconnect/retry.
