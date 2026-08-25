@@ -18,6 +18,18 @@ app.get('/health-check', (req, res) => {
   res.status(200).send('Server is running');
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
+// Application version derived from npm_package_version (set by npm during npm start);
+// falls back to '1.0.0' when unset (e.g. running node directly).
+const APP_VERSION = process.env.npm_package_version || '1.0.0';
+
+app.get('/version', (req, res) => {
+  res.json({ version: APP_VERSION });
+});
+
 app.use('/api/auth', authRoutes);
 
 // Connect to MongoDB, then start the server. Server error handler lets us reconnect/retry.
