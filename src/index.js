@@ -14,6 +14,19 @@ app.get('/hello', (req, res) => {
   res.json({ message: 'hello' });
 });
 
+// POST /plus — add two numeric operands provided in the JSON body.
+// Accepts integers and floats; rejects missing, null, non-numeric,
+// NaN, or Infinity values with a 400 response.
+app.post('/plus', (req, res) => {
+  const { a, b } = req.body || {};
+
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    return res.status(400).json({ error: 'a and b must be finite numbers' });
+  }
+
+  return res.status(200).json({ result: a + b });
+});
+
 app.get('/health-check', (req, res) => {
   res.status(200).send('Server is running');
 });
@@ -66,4 +79,10 @@ async function start() {
   });
 }
 
-start();
+// Only auto-start when run directly (npm start / node src/index.js).
+// Exporting the app lets tests mount it without a MongoDB connection.
+if (require.main === module) {
+  start();
+}
+
+module.exports = app;
