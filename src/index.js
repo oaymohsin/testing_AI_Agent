@@ -27,6 +27,19 @@ app.post('/plus', (req, res) => {
   return res.status(200).json({ result: a + b });
 });
 
+// POST /minus — subtract b from a, with the same validation as /plus.
+// Accepts integers and floats (negative, zero); rejects missing, null,
+// non-numeric, NaN, or Infinity operands with a 400 response.
+app.post('/minus', (req, res) => {
+  const { a, b } = req.body || {};
+
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    return res.status(400).json({ error: 'a and b must be finite numbers' });
+  }
+
+  return res.status(200).json({ result: a - b });
+});
+
 app.get('/health-check', (req, res) => {
   res.status(200).send('Server is running');
 });
