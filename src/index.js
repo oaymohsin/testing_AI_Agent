@@ -32,6 +32,20 @@ app.get('/version', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 
+// Static in-memory list of users known to the system.
+// Used as the initial data source until a database-backed store is introduced.
+const USERS = [
+  { id: 1, name: 'Alice' },
+  { id: 2, name: 'Bob' },
+  { id: 3, name: 'Charlie' },
+];
+
+// GET /api/users — return the full list of users. Public endpoint, no auth,
+// no query parameters, no side effects beyond serving the static list.
+app.get('/api/users', (req, res) => {
+  res.status(200).json(USERS);
+});
+
 // Connect to MongoDB, then start the server. Server error handler lets us reconnect/retry.
 async function start() {
   if (!MONGODB_URI) {
