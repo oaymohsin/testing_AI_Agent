@@ -40,6 +40,20 @@ app.post('/minus', (req, res) => {
   return res.status(200).json({ result: a - b });
 });
 
+// POST /multiply — multiply a by b, with the same validation as /plus and /minus.
+// Accepts integers and floats (negative, zero); rejects missing, null,
+// non-numeric, NaN, or Infinity operands with a 400 response. Returns 0 when
+// either operand is 0.
+app.post('/multiply', (req, res) => {
+  const { a, b } = req.body || {};
+
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    return res.status(400).json({ error: 'a and b must be finite numbers' });
+  }
+
+  return res.status(200).json({ result: a * b });
+});
+
 app.get('/health-check', (req, res) => {
   res.status(200).send('Server is running');
 });
