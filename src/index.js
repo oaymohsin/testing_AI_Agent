@@ -1,12 +1,22 @@
 const express = require('express');
-const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth');
 
 const app = express();
 const port = process.env.PORT || 3008;
 
-const MONGODB_URI = process.env.MONGODB_URI;
+// Allow the local Vite dev server to call this API from the browser.
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
+
+  next();
+});
 
 app.use(express.json());
 
@@ -120,30 +130,12 @@ app.get('/api/users', (req, res) => {
   res.status(200).json(USERS);
 });
 
-// Connect to MongoDB, then start the server. Server error handler lets us reconnect/retry.
-async function start() {
-  if (!MONGODB_URI) {
-    console.error('MONGODB_URI environment variable is required.');
-    process.exit(1);
-  }
-
-  try {
-    await mongoose.connect(MONGODB_URI);
-    console.log('MongoDB connected');
-  } catch (err) {
-    console.error('Failed to connect to MongoDB:', err.message);
-    process.exit(1);
-  }
-
+// Only auto-start when run directly (npm start / node src/index.js).
+// Exporting the app lets tests mount it without starting a listener.
+if (require.main === module) {
   app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
   });
-}
-
-// Only auto-start when run directly (npm start / node src/index.js).
-// Exporting the app lets tests mount it without a MongoDB connection.
-if (require.main === module) {
-  start();
 }
 
 module.exports = app;
