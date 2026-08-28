@@ -7,7 +7,7 @@
     "start": "npm run start:dev",
     "start:dev": "node --watch src/index.js",
     "start:prod": "node src/index.js",
-    "test": "node test/plus.test.js && node test/minus.test.js && node test/multiply.test.js && node test/divide.test.js"
+    "test": "node test/plus.test.js && node test/minus.test.js && node test/multiply.test.js && node test/divide.test.js && node test/count-characters.test.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

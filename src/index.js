@@ -27,6 +27,22 @@ app.post('/plus', (req, res) => {
   return res.status(200).json({ result: a + b });
 });
 
+// POST /count-characters — return the UTF-16 character length of the input text.
+// Accepts a string text field; rejects missing, null, or non-string values with 400.
+app.post('/count-characters', (req, res) => {
+  try {
+    const { text } = req.body || {};
+
+    if (typeof text !== 'string') {
+      return res.status(400).json({ error: 'text must be a string' });
+    }
+
+    return res.status(200).json({ count: text.length });
+  } catch (err) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /minus — subtract b from a, with the same validation as /plus.
 // Accepts integers and floats (negative, zero); rejects missing, null,
 // non-numeric, NaN, or Infinity operands with a 400 response.
