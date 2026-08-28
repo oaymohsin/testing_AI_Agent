@@ -30,13 +30,17 @@ app.post('/plus', (req, res) => {
 // POST /count-characters — return the UTF-16 character length of the input text.
 // Accepts a string text field; rejects missing, null, or non-string values with 400.
 app.post('/count-characters', (req, res) => {
-  const { text } = req.body || {};
+  try {
+    const { text } = req.body || {};
 
-  if (typeof text !== 'string') {
-    return res.status(400).json({ error: 'text must be a string' });
+    if (typeof text !== 'string') {
+      return res.status(400).json({ error: 'text must be a string' });
+    }
+
+    return res.status(200).json({ count: text.length });
+  } catch (err) {
+    return res.status(500).json({ error: 'Internal server error' });
   }
-
-  return res.status(200).json({ count: text.length });
 });
 
 // POST /minus — subtract b from a, with the same validation as /plus.

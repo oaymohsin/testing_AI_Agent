@@ -52,7 +52,11 @@ userSchema.pre('save', async function (next) {
 
 // Compare an unhashed candidate against the stored hash.
 userSchema.methods.comparePassword = async function (candidate) {
-  return bcrypt.compare(candidate, this.password);
+  try {
+    return await bcrypt.compare(candidate, this.password);
+  } catch (err) {
+    return false;
+  }
 };
 
 // toJSON transform strips the password (and __v) from serialized outputs.
