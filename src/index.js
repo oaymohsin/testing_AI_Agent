@@ -98,6 +98,28 @@ app.post('/divide', (req, res) => {
   return res.status(200).json({ result: a / b });
 });
 
+// POST /factorial — compute n! for a non-negative integer n.
+// Accepts a numeric n field; rejects missing, null, non-integer, negative,
+// NaN, or Infinity values with a 400 response.
+app.post('/factorial', (req, res) => {
+  const { n } = req.body || {};
+
+  if (!Number.isInteger(n) || n < 0) {
+    return res.status(400).json({ error: 'n must be a non-negative integer' });
+  }
+
+  if (n === 0 || n === 1) {
+    return res.status(200).json({ result: 1 });
+  }
+
+  let result = 1;
+  for (let i = 2; i <= n; i++) {
+    result *= i;
+  }
+
+  return res.status(200).json({ result });
+});
+
 app.get('/health-check', (req, res) => {
   res.status(200).send('Server is running');
 });
