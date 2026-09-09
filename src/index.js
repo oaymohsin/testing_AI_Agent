@@ -128,6 +128,10 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
+app.get('/todaydatetime', (req, res) => {
+  res.status(200).json({ datetime: new Date().toISOString() });
+});
+
 // Application version derived from npm_package_version (set by npm during npm start);
 // falls back to '1.0.0' when unset (e.g. running node directly).
 const APP_VERSION = process.env.npm_package_version || '1.0.0';
