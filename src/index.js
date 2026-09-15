@@ -156,6 +156,117 @@ app.get('/api/users', (req, res) => {
   res.status(200).json(USERS);
 });
 
+// Static in-memory client request history for reports and CSV export.
+const CLIENT_REQUESTS = [
+  {
+    tmKey: 'TASK-1',
+    title: 'Fix login redirect',
+    board: 'task',
+    status: 'In Progress',
+    client: 'Acme Corp',
+    createdAt: '2024-06-01T12:00:00.000Z',
+  },
+  {
+    tmKey: 'TASK-2',
+    title: 'Deploy staging',
+    board: 'task',
+    status: 'Done',
+    client: 'Acme Corp',
+    createdAt: '2024-06-02T14:30:00.000Z',
+  },
+  {
+    tmKey: 'BUG-1',
+    title: 'Crash on logout',
+    board: 'bug',
+    status: 'In Progress',
+    client: 'Beta Inc',
+    createdAt: '2024-06-03T09:15:00.000Z',
+  },
+  {
+    tmKey: 'TASK-3',
+    title: 'Update docs',
+    board: 'task',
+    status: 'Open',
+    client: 'Globex',
+    createdAt: '2024-06-04T16:45:00.000Z',
+  },
+];
+
+const CLIENT_REPORT_FILTER_PARAMS = ['client', 'board', 'status'];
+
+function validateClientReportQuery(query) {
+  for (const param of CLIENT_REPORT_FILTER_PARAMS) {
+    if (Object.prototype.hasOwnProperty.call(query, param)) {
+      const value = query[param];
+      if (typeof value !== 'string' || value.trim() === '') {
+        return `${param} must be a non-empty string`;
+      }
+    }
+  }
+  return null;
+}
+
+function filterClientRequests(query) {
+  let rows = CLIENT_REQUESTS;
+
+  for (const param of CLIENT_REPORT_FILTER_PARAMS) {
+    if (query[param] === undefined) {
+      continue;
+    }
+    const needle = query[param].trim().toLowerCase();
+    rows = rows.filter((row) => String(row[param]).trim().toLowerCase() === needle);
+  }
+
+  return rows;
+}
+
+function escapeCsvField(value) {
+  const s = String(value);
+  if (/[",\n\r]/.test(s)) {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  return s;
+}
+
+function clientRequestsToCsv(rows) {
+  const columns = ['tmKey', 'title', 'board', 'status', 'client', 'createdAt'];
+  const header = columns.join(',');
+  const dataLines = rows.map((row) =>
+    columns.map((col) => escapeCsvField(row[col])).join(',')
+  );
+  return [header, ...dataLines].join('\n');
+}
+
+function handleClientReportFilterError(req, res) {
+  const message = validateClientReportQuery(req.query);
+  if (message) {
+    res.status(400).json({ error: message });
+    return true;
+  }
+  return false;
+}
+
+// GET /api/client-reports/requests — filtered JSON list of client request history.
+app.get('/api/client-reports/requests', (req, res) => {
+  if (handleClientReportFilterError(req, res)) {
+    return;
+  }
+  res.status(200).json(filterClientRequests(req.query));
+});
+
+// GET /api/client-reports/export — same filters as requests, returned as CSV download.
+app.get('/api/client-reports/export', (req, res) => {
+  if (handleClientReportFilterError(req, res)) {
+    return;
+  }
+  const rows = filterClientRequests(req.query);
+  res
+    .status(200)
+    .type('text/csv')
+    .set('Content-Disposition', 'attachment; filename="client-requests.csv"')
+    .send(clientRequestsToCsv(rows));
+});
+
 // Only auto-start when run directly (npm start / node src/index.js).
 // Exporting the app lets tests mount it without starting a listener.
 if (require.main === module) {
