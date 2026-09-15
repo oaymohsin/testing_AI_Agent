@@ -36,6 +36,8 @@ Applied in order before any route handler (`src/index.js`):
 
 Responses are JSON, plain text, or CSV per handler (see route catalog).
 
+**Peer Vite frontend** (separate repo): calculator and list pages call these flat paths via `VITE_API_BASE` and the dev-server proxy to this backend on port **3008**; UI hash routing is documented in the frontend repo, not here.
+
 ```mermaid
 flowchart LR
   Client --> CORS
@@ -53,6 +55,7 @@ Authoritative HTTP routes (method + path):
 - `POST /count-characters`
 - `POST /minus`
 - `POST /multiply`
+- `POST /power`
 - `POST /divide`
 - `POST /factorial`
 - `GET /health-check`
@@ -74,6 +77,7 @@ All paths are on the root app unless noted. Unlisted methods/paths receive Expre
 | POST | `/count-characters` | Public | **200** `{ "count": text.length }` or **400** `{ "error": "text must be a string" }`; unexpected errors **500** |
 | POST | `/minus` | Public | Same operand validation as `/plus`; **200** `{ "result": a - b }` |
 | POST | `/multiply` | Public | Same validation; **200** `{ "result": a * b }` (0 if either operand is 0) |
+| POST | `/power` | Public | Same validation as `/multiply`; **200** `{ "result": Math.pow(a, b) }` or **400** `{ "error": "a and b must be finite numbers" }` |
 | POST | `/divide` | Public | Same validation; **400** `{ "error": "b must not be zero" }` when `b === 0`; **200** `{ "result": a / b }` |
 | POST | `/factorial` | Public | **200** `{ "result": n! }` for non-negative integer `n` (`0!`/`1!` → 1); **400** `{ "error": "n must be a non-negative integer" }` |
 | GET | `/health-check` | Public | **200** plain text `Server is running` |
@@ -184,11 +188,12 @@ sequenceDiagram
 1. `node test/plus.test.js`
 2. `node test/minus.test.js`
 3. `node test/multiply.test.js`
-4. `node test/divide.test.js`
-5. `node test/count-characters.test.js`
-6. `node test/factorial.test.js`
-7. `node test/todaydatetime.test.js`
-8. `node test/client-reports.test.js`
+4. `node test/power.test.js`
+5. `node test/divide.test.js`
+6. `node test/count-characters.test.js`
+7. `node test/factorial.test.js`
+8. `node test/todaydatetime.test.js`
+9. `node test/client-reports.test.js`
 
 **Pattern** (as in `test/plus.test.js`):
 

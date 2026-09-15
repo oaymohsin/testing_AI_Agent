@@ -80,6 +80,17 @@ app.post('/multiply', (req, res) => {
   return res.status(200).json({ result: a * b });
 });
 
+// POST /power — raise a to exponent b, with the same validation as /multiply.
+app.post('/power', (req, res) => {
+  const { a, b } = req.body || {};
+
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    return res.status(400).json({ error: 'a and b must be finite numbers' });
+  }
+
+  return res.status(200).json({ result: Math.pow(a, b) });
+});
+
 // POST /divide — divide a by b, with the same validation as /plus, /minus, and
 // /multiply. Accepts integers and floats (negative, zero) for a; rejects missing,
 // null, non-numeric, NaN, or Infinity operands with a 400 response. Division by
