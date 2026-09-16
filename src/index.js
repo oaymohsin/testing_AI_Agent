@@ -98,6 +98,19 @@ app.post('/divide', (req, res) => {
   return res.status(200).json({ result: a / b });
 });
 
+// POST /power — raise a to the exponent b, with the same validation as /plus,
+// /minus, /multiply, and /divide. Accepts integers and floats (negative, zero);
+// rejects missing, null, non-numeric, NaN, or Infinity operands with a 400 response.
+app.post('/power', (req, res) => {
+  const { a, b } = req.body || {};
+
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    return res.status(400).json({ error: 'a and b must be finite numbers' });
+  }
+
+  return res.status(200).json({ result: a ** b });
+});
+
 // POST /factorial — compute n! for a non-negative integer n.
 // Accepts a numeric n field; rejects missing, null, non-integer, negative,
 // NaN, or Infinity values with a 400 response.
