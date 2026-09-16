@@ -98,6 +98,24 @@ app.post('/divide', (req, res) => {
   return res.status(200).json({ result: a / b });
 });
 
+// POST /modulo — JavaScript remainder a % b, with the same validation as /divide.
+// Accepts integers and floats (negative, zero) for a; rejects missing, null,
+// non-numeric, NaN, or Infinity operands with a 400 response. Divisor b === 0
+// is rejected with a separate 400 response and never computed.
+app.post('/modulo', (req, res) => {
+  const { a, b } = req.body || {};
+
+  if (!Number.isFinite(a) || !Number.isFinite(b)) {
+    return res.status(400).json({ error: 'a and b must be finite numbers' });
+  }
+
+  if (b === 0) {
+    return res.status(400).json({ error: 'b must not be zero' });
+  }
+
+  return res.status(200).json({ result: a % b });
+});
+
 // POST /power — raise a to the exponent b, with the same validation as /plus,
 // /minus, /multiply, and /divide. Accepts integers and floats (negative, zero);
 // rejects missing, null, non-numeric, NaN, or Infinity operands with a 400 response.
